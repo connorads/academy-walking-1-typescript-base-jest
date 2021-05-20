@@ -74,11 +74,11 @@ export class Rover {
     private direction: Direction = new North();
     private position: Position = {x:0, y:0}
 
-    private moveRight(): void {
+    moveRight(): void {
         this.direction = this.direction.turnRight();
     }
 
-    private moveForward(): void {
+    moveForward(): void {
         const {x,y} = this.direction.getDelta()
         const newPosition = addDelta(this.position.x, x);
         this.position.x = newPosition;
@@ -89,15 +89,47 @@ export class Rover {
     }
 
     execute(command: string) {
-        for(const c of command) {
-            if (c === "R") {
-                this.moveRight();
-            }
-            if (c === "M") {
-                this.moveForward();
-            }
-        }
-        return `${this.position.x}:${this.position.y}:${this.direction.value}`;
+        execute(parseCommands(this, command))
+        return this.getCurrentPosition()
     }
 
+    getCurrentPosition = () => `${this.position.x}:${this.position.y}:${this.direction.value}`
+
+}
+
+const parseCommands = (rover:Rover, commands:string): Command[] => {
+    const commandz: Command[] = [];
+    for(const c of commands) {
+        if (c === "R") {
+            commandz.push(new RightCommand(rover))
+        }
+        if (c === "M") {
+            commandz.push(new ForwardCommand(rover))
+        }
+    }
+    return commandz; // TODO Rename
+}
+
+const execute = (commands: Command[]): void => {
+    for(const c of commands) {
+        c.execute();
+    }
+}
+
+interface Command {
+    execute(): void
+}
+
+class RightCommand implements Command {
+    constructor(private readonly rover: Rover){}
+    execute(): void {
+        this.rover.moveRight();
+    }
+}
+
+class ForwardCommand implements Command {
+    constructor(private readonly rover: Rover){}
+    execute(): void {
+        this.rover.moveForward();
+    }
 }
