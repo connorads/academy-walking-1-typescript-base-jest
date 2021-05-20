@@ -1,6 +1,43 @@
 
 type Direction = "N" | "E" | "S" | "W"
 
+interface Thingy {
+    value: "N" | "E" | "S" | "W"
+    turnRight(): Thingy
+}
+
+class North implements Thingy {
+    constructor(){}
+    turnRight(): Thingy {
+        return new East()
+    }
+    readonly value = "N"
+}
+
+class East implements Thingy {
+    constructor(){}
+    turnRight(): Thingy {
+        return new South()
+    }
+    readonly value = "E"
+}
+
+class South implements Thingy {
+    constructor(){}
+    turnRight(): Thingy {
+        return new West()
+    }
+    readonly value = "S"
+}
+
+class West implements Thingy {
+    constructor(){}
+    turnRight(): Thingy {
+        return new North()
+    }
+    readonly value = "W"
+}
+
 const getNextRight = (direction: Direction): Direction => {
     switch(direction) {
         case "N":
@@ -48,15 +85,15 @@ const getPositionDelta = (position: Position, direction: Direction): Position  =
 
 
 export class Rover {
-    private direction: Direction = "N";
+    private direction: Thingy = new North();
     private position: Position = {x:0, y:0}
 
     private moveRight(): void {
-        this.direction = getNextRight(this.direction);
+        this.direction = this.direction.turnRight();
     }
 
     private moveForward(): void {
-        const {x,y} = getPositionDelta(this.position, this.direction)
+        const {x,y} = getPositionDelta(this.position, this.direction.value)
         const newPosition = addDelta(this.position.x, x);
         this.position.x = newPosition;
 
@@ -75,7 +112,7 @@ export class Rover {
                 this.moveForward();
             }
         }
-        return `${this.position.x}:${this.position.y}:${this.direction}`;
+        return `${this.position.x}:${this.position.y}:${this.direction.value}`;
     }
 
 }
