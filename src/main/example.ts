@@ -89,8 +89,7 @@ export class Rover {
     }
 
     execute(command: string) {
-        const commands = command.split("");
-        for(const c of commands) {
+        for(const c of command) {
             if (c === "R") {
                 this.moveRight();
             }
